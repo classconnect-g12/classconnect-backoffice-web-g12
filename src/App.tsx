@@ -1,13 +1,18 @@
-import './App.css'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Register from './pages/Register';
+import Panel from './pages/Panel';
 
 function App() {
   return (
     <>
-      <div className='h-screen flex items-center justify-center'>
-        <div className='bg-blue-500 text-white p-4 rounded'>
-          <h1 className='text-white'>Tailwind</h1>
-        </div>
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/panel" element={<Panel />} />
+        </Routes>
+      </Router>
     </>
   )
 }

@@ -1,12 +1,12 @@
 import { TabNav } from "@radix-ui/themes";
 
-const Home: React.FC = () => {
+const AdminRegister: React.FC = () => {
   return (
     <>
       <div className="w-1/2 mx-auto">
         <TabNav.Root>
-          <TabNav.Link href="#/home" active>Home</TabNav.Link>
-          <TabNav.Link href="#/admin-register">
+          <TabNav.Link href="#/home">Home</TabNav.Link>
+          <TabNav.Link href="#/admin-register" active>
             Admin registration
           </TabNav.Link>
           <TabNav.Link href="#/user-management">User management</TabNav.Link>
@@ -16,4 +16,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default AdminRegister;

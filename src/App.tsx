@@ -1,20 +1,22 @@
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Register from './pages/Register';
-import Panel from './pages/Panel';
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/login";
+import Home from "./pages/home";
+import UserManagement from "./pages/user-management";
+import AdminRegister from "./pages/admin-register";
 
 function App() {
   return (
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/panel" element={<Panel />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/admin-register" element={<AdminRegister />} />
+          <Route path="/user-management" element={<UserManagement />} />
+          <Route path="/home" element={<Home />} />
         </Routes>
       </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

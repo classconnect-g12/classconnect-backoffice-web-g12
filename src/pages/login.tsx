@@ -1,6 +1,7 @@
 import { useState } from "react";
 import login from "../services/authService";
-import { Spinner } from "@radix-ui/themes";
+import { Callout, Spinner } from "@radix-ui/themes";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 
 const Login: React.FC = () => {
   const [user, setUser] = useState({
@@ -9,6 +10,7 @@ const Login: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     setIsLoading(true);
@@ -20,7 +22,7 @@ const Login: React.FC = () => {
         window.location.href = "/#/home";
       }
     } catch (err) {
-      console.error("Login failed:", err);
+      setError(err.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -28,7 +30,15 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <div className="h-screen flex items-center justify-center px-4">
+      <div className="h-screen flex flex-col items-center justify-center px-4">
+        {error ? (
+          <Callout.Root color="red" size="1" className="max-w-sm w-full">
+            <Callout.Icon>
+              <InfoCircledIcon />
+            </Callout.Icon>
+            <Callout.Text>{error}</Callout.Text>
+          </Callout.Root>
+        ) : null}
         <div className="text-white p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center space-y-5 border-2 border-gray-500 bg-gray-800">
           <h1 className="text-white text-lg font-bold">
             ClassConnect backOffice
@@ -62,7 +72,7 @@ const Login: React.FC = () => {
                         ${
                           isLoading
                             ? "bg-black cursor-wait"
-                            : "bg-gray-600 hover:bg-red-600 text-white"
+                            : "bg-gray-600 hover:bg-green-600 text-white"
                         }`}
               >
                 {isLoading ? <Spinner size="3" /> : "Sign in"}

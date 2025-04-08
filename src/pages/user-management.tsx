@@ -12,20 +12,8 @@ type User = {
 };
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[] | null>(null);
 
-  /*
-  useEffect(() => {
-    axios
-      .get<User[]>("https://tu-api.com/api/users")
-      .then((response) => {
-        setUsers(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
-      });
-  }, []);
-  */
+  const [users, setUsers] = useState<User[] | null>(null);
 
   const renderSkeletonRow = () => (
     <Table.Row>
@@ -64,7 +52,7 @@ const UserManagement: React.FC = () => {
       </TabNav.Root>
 
       <TextField.Root placeholder="Search the users…" className="mt-10">
-        <TextField.Slot>{/*Falta el icono*/}</TextField.Slot>
+        <TextField.Slot> {/*<MagnifyingGlassIcon height="16" width="16" /> */}</TextField.Slot>
         
       </TextField.Root>
       <div className="mt-10">

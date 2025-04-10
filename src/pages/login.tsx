@@ -22,7 +22,7 @@ const Login: React.FC = () => {
         window.location.href = "/#/home";
       }
     } catch (err) {
-      setError(err.message || "Login failed. Please try again.");
+      setError((err as Error).message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

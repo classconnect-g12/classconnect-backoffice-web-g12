@@ -1,45 +1,70 @@
-import React, { useState } from "react";
-import { Skeleton, Table, TabNav, TextField } from "@radix-ui/themes";
+import React, { useEffect, useState } from "react";
+import { TextField, TabNav } from "@radix-ui/themes";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import UserTable from "../components/UserTable";
+import { User } from "../types/user";
+import { getUsers } from "../services/userService";
 
-type User = {
-  username: string;
-  email: string;
-  role: string;
-  firstName: string;
-  lastName: string;
-  registrationDate: string;
-  state: "Active" | "Inactive";
-};
+const mockUsers: User[] = [
+  {
+    username: "jdoe",
+    email: "jdoe@example.com",
+    role: "Admin",
+    firstName: "John",
+    lastName: "Doe",
+    registrationDate: "2024-11-01",
+    state: "Active",
+  },
+  {
+    username: "asmith",
+    email: "asmith@example.com",
+    role: "User",
+    firstName: "Alice",
+    lastName: "Smith",
+    registrationDate: "2024-10-15",
+    state: "Blocked",
+  },
+  {
+    username: "bwayne",
+    email: "bwayne@example.com",
+    role: "Moderator",
+    firstName: "Bruce",
+    lastName: "Wayne",
+    registrationDate: "2024-12-05",
+    state: "Active",
+  },
+];
 
 const UserManagement: React.FC = () => {
-
   const [users, setUsers] = useState<User[] | null>(null);
 
-  const renderSkeletonRow = () => (
-    <Table.Row>
-      <Table.RowHeaderCell>
-        <Skeleton className="h-4 w-24" />
-      </Table.RowHeaderCell>
-      <Table.Cell>
-        <Skeleton className="h-4 w-40" />
-      </Table.Cell>
-      <Table.Cell>
-        <Skeleton className="h-4 w-24" />
-      </Table.Cell>
-      <Table.Cell>
-        <Skeleton className="h-4 w-20" />
-      </Table.Cell>
-      <Table.Cell>
-        <Skeleton className="h-4 w-24" />
-      </Table.Cell>
-      <Table.Cell>
-        <Skeleton className="h-4 w-28" />
-      </Table.Cell>
-      <Table.Cell>
-        <Skeleton className="h-4 w-16" />
-      </Table.Cell>
-    </Table.Row>
-  );
+  useEffect(() => {
+    // TODO! Make errors more user-friendly
+
+    const fetchUsers = async () => {
+      try {
+        const response = await getUsers();
+        if (response && response.data) {
+          setUsers(response.data);
+        } else {
+          console.log("No users found, using mock data.");
+          setUsers(mockUsers);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setUsers(mockUsers);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const handleEditUser = (updatedUser: User) => {
+    if (!users) return;
+    setUsers(
+      users.map((u) => (u.username === updatedUser.username ? updatedUser : u))
+    );
+  };
 
   return (
     <div className="w-8/12 mx-auto">
@@ -52,43 +77,13 @@ const UserManagement: React.FC = () => {
       </TabNav.Root>
 
       <TextField.Root placeholder="Search the users…" className="mt-10">
-        <TextField.Slot> {/*<MagnifyingGlassIcon height="16" width="16" /> */}</TextField.Slot>
-        
+        <TextField.Slot>
+          <MagnifyingGlassIcon height="16" width="16" />
+        </TextField.Slot>
       </TextField.Root>
-      <div className="mt-10">
-        <Table.Root>
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>Username</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Email</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Role</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>First name</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Last name</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Registration date</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>State</Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
 
-          <Table.Body>
-            {!users
-              ? Array.from({ length: 3 }).map((_, idx) => (
-                  <React.Fragment key={idx}>
-                    {renderSkeletonRow()}
-                  </React.Fragment>
-                ))
-              : users.map((user) => (
-                  <Table.Row key={user.username}>
-                    <Table.RowHeaderCell>{user.username}</Table.RowHeaderCell>
-                    <Table.Cell>{user.email}</Table.Cell>
-                    <Table.Cell>{user.role}</Table.Cell>
-                    <Table.Cell>{user.firstName}</Table.Cell>
-                    <Table.Cell>{user.lastName}</Table.Cell>
-                    <Table.Cell>{user.registrationDate}</Table.Cell>
-                    <Table.Cell>{user.state}</Table.Cell>
-                  </Table.Row>
-                ))}
-          </Table.Body>
-        </Table.Root>
+      <div className="mt-10">
+        <UserTable users={users} onEdit={handleEditUser} />
       </div>
     </div>
   );

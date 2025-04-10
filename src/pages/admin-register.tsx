@@ -1,137 +1,92 @@
-import {
-  Badge,
-  Button,
-  Code,
-  DataList,
-  Dialog,
-  Flex,
-  Grid,
-  TabNav,
-  Text,
-  TextField,
-} from "@radix-ui/themes";
+import { Grid, Spinner, TabNav } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
+import AddAdminDialog from "../components/AddAdminDialog";
+import AdminCard from "../components/AdminCard";
+
+interface Admin {
+  username: string;
+  email: string;
+  status: "Authorized" | "Blocked";
+}
 
 const AdminRegister: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [newAdmin, setNewAdmin] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  useEffect(() => {
+    // TODO! Fetch the list of admins from the API
+    // Simulating an API call with a timeout
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+      setAdmins([
+        {
+          username: "Eve",
+          email: "eve.holt@reqres.in",
+          status: "Authorized",
+        },
+        {
+          username: "TestUser",
+          email: "test@gmail.com",
+          status: "Blocked",
+        },
+      ]);
+    }, 1500);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  const handleAddAdmin = () => {
+    //TODO! Add API call to register the new admin
+    setAdmins([
+      ...admins,
+      {
+        username: newAdmin.username,
+        email: newAdmin.email,
+        status: "Authorized",
+      },
+    ]);
+    setNewAdmin({ username: "", email: "", password: "" });
+  };
+
   return (
-    <>
-      <div className="w-8/12 mx-auto">
-        <TabNav.Root>
-          <TabNav.Link href="#/home">Home</TabNav.Link>
-          <TabNav.Link href="#/admin-register" active>
-            Admin registration
-          </TabNav.Link>
-          <TabNav.Link href="#/user-management">User management</TabNav.Link>
-        </TabNav.Root>
+    <div className="w-8/12 mx-auto">
+      <TabNav.Root>
+        <TabNav.Link href="#/home">Home</TabNav.Link>
+        <TabNav.Link href="#/admin-register" active>
+          Admin registration
+        </TabNav.Link>
+        <TabNav.Link href="#/user-management">User management</TabNav.Link>
+      </TabNav.Root>
 
-        <div className="mt-10 ml-10">
-          <Dialog.Root>
-            <Dialog.Trigger>
-              <Button>Add Admin</Button>
-            </Dialog.Trigger>
-
-            <Dialog.Content maxWidth="450px">
-              <Dialog.Title>Add Admin</Dialog.Title>
-              <Dialog.Description size="2" mb="4">
-                Fill in the form below to add a new admin to the system.
-              </Dialog.Description>
-
-              <Flex direction="column" gap="3">
-                <label>
-                  <Text as="div" size="2" mb="1" weight="bold">
-                    Username
-                  </Text>
-                  <TextField.Root placeholder="Username" />
-                </label>
-                <label>
-                  <Text as="div" size="2" mb="1" weight="bold">
-                    Email
-                  </Text>
-                  <TextField.Root placeholder="Email" />
-                </label>
-                <label>
-                  <Text as="div" size="2" mb="1" weight="bold">
-                    Password
-                  </Text>
-                  <TextField.Root placeholder="Password" />
-                </label>
-              </Flex>
-
-              <Flex gap="3" mt="4" justify="end">
-                <Dialog.Close>
-                  <Button variant="soft" color="gray">
-                    Cancel
-                  </Button>
-                </Dialog.Close>
-                <Dialog.Close>
-                  <Button>Add</Button>
-                </Dialog.Close>
-              </Flex>
-            </Dialog.Content>
-          </Dialog.Root>
-        </div>
-
-        <Grid
-          columns="3"
-          gap="3"
-          rows="repeat(2, 64px)"
-          width="auto"
-          className="mt-10 ml-10"
-        >
-          <DataList.Root>
-            <DataList.Item>
-              <DataList.Label minWidth="88px">ID</DataList.Label>
-              <DataList.Value>
-                <Flex align="center" gap="2">
-                  <Code variant="ghost">1</Code>
-                </Flex>
-              </DataList.Value>
-            </DataList.Item>
-            <DataList.Item>
-              <DataList.Label minWidth="88px">Username</DataList.Label>
-              <DataList.Value>Eve</DataList.Value>
-            </DataList.Item>
-            <DataList.Item>
-              <DataList.Label minWidth="88px">Email</DataList.Label>
-              <DataList.Value>eve.holt@reqres.in</DataList.Value>
-            </DataList.Item>
-            <DataList.Item align="center">
-              <DataList.Label minWidth="88px">Status</DataList.Label>
-              <DataList.Value>
-                <Badge color="jade" variant="soft" radius="full">
-                  Authorized
-                </Badge>
-              </DataList.Value>
-            </DataList.Item>
-          </DataList.Root>
-          <DataList.Root>
-            <DataList.Item>
-              <DataList.Label minWidth="88px">ID</DataList.Label>
-              <DataList.Value>
-                <Flex align="center" gap="2">
-                  <Code variant="ghost">2</Code>
-                </Flex>
-              </DataList.Value>
-            </DataList.Item>
-            <DataList.Item>
-              <DataList.Label minWidth="88px">Username</DataList.Label>
-              <DataList.Value>TestUser</DataList.Value>
-            </DataList.Item>
-            <DataList.Item>
-              <DataList.Label minWidth="88px">Email</DataList.Label>
-              <DataList.Value>test@gmail.com</DataList.Value>
-            </DataList.Item>
-            <DataList.Item align="center">
-              <DataList.Label minWidth="88px">Status</DataList.Label>
-              <DataList.Value>
-                <Badge color="red" variant="soft" radius="full">
-                  Blocked
-                </Badge>
-              </DataList.Value>
-            </DataList.Item>
-          </DataList.Root>
-        </Grid>
+      <div className="mt-10 ml-10">
+        <AddAdminDialog
+          newAdmin={newAdmin}
+          setNewAdmin={setNewAdmin}
+          handleAddAdmin={handleAddAdmin}
+        />
       </div>
-    </>
+
+      {isLoading ? (
+        <div className="flex justify-center mt-10">
+          <Spinner size="3" className="mt-10" />
+        </div>
+      ) : (
+        <Grid columns="3" gap="4" width="auto" className="mt-10 ml-10">
+          {admins.map((admin, index) => (
+            <AdminCard
+              key={index}
+              username={admin.username}
+              email={admin.email}
+              status={admin.status}
+            />
+          ))}
+        </Grid>
+      )}
+    </div>
   );
 };
 

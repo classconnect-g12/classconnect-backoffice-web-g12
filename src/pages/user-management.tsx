@@ -5,6 +5,7 @@ import UserTable from "../components/UserTable";
 import { User } from "../types/user";
 import { getUsers } from "../services/userService";
 import TabNavigation from "../components/TabNavigation";
+import sessionService from "../services/sessionService";
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
@@ -28,6 +29,7 @@ const UserManagement: React.FC = () => {
           (error as { status?: number }).status === 401
         ) {
           setError("Error. Your session has expired. Please log in again.");
+          sessionService.clearSession();
           window.location.href = "/";
         }
       }

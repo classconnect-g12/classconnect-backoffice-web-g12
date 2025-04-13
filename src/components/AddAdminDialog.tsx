@@ -9,6 +9,7 @@ import {
   Callout,
 } from "@radix-ui/themes";
 import authService from "../services/authService";
+import sessionService from "../services/sessionService";
 
 interface AddAdminDialogProps {
   newAdmin: { email: string; password: string };
@@ -26,9 +27,10 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const validateFields = () => {
-    if (!newAdmin.email || !newAdmin.password) {
+    if (!newAdmin.email || !newAdmin.password || !confirmPassword) {
       setError("All fields are required.");
       return false;
     }
@@ -36,12 +38,20 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
       setError("Invalid email address.");
       return false;
     }
+    if (newAdmin.password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return false;
+    }
+    if (newAdmin.password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return false;
+    }
     return true;
   };
 
   const onAddAdminClick = async () => {
+    
     if (!validateFields()) return;
-
     setIsSubmitting(true);
     setError("");
 
@@ -54,7 +64,7 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
         onAdminAdded(newAdmin.email);
         setIsOpen(false);
         setNewAdmin({ email: "", password: "" });
-      }else {
+      } else {
         setError("Unexpected error occurred.");
       }
     } catch (err) {
@@ -69,9 +79,11 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
         err &&
         typeof err === "object" &&
         "status" in err &&
-        (err as { status?: number }).status === 500
+        (err as { status?: number }).status === 401
       ) {
-        setError("Server error. Please try again later.");
+        setError("Error. Your session has expired. Please log in again.");
+        sessionService.clearSession();
+        window.location.href = "/";
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
@@ -111,6 +123,7 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
             </Text>
             <TextField.Root
               type="email"
+              placeholder="Enter admin email"
               value={newAdmin.email}
               onChange={(e) =>
                 setNewAdmin({ ...newAdmin, email: e.target.value })
@@ -123,10 +136,22 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
             </Text>
             <TextField.Root
               type="password"
+              placeholder="Enter admin password"
               value={newAdmin.password}
               onChange={(e) =>
                 setNewAdmin({ ...newAdmin, password: e.target.value })
               }
+            />
+          </label>
+          <label>
+            <Text size="2" mb="1" weight="bold">
+              Confirm Password
+            </Text>
+            <TextField.Root
+              type="password"
+              placeholder="Confirm admin password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </label>
         </Flex>
@@ -147,7 +172,7 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
           <Button
             onClick={onAddAdminClick}
             disabled={isSubmitting}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: isSubmitting ? "default" : "pointer" }}
           >
             {isSubmitting ? "Adding..." : "Add"}
           </Button>

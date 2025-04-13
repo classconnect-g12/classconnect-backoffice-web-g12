@@ -5,36 +5,6 @@ import UserTable from "../components/UserTable";
 import { User } from "../types/user";
 import { getUsers } from "../services/userService";
 
-const mockUsers: User[] = [
-  {
-    username: "jdoe",
-    email: "jdoe@example.com",
-    role: "Admin",
-    firstName: "John",
-    lastName: "Doe",
-    registrationDate: "2024-11-01",
-    state: "Active",
-  },
-  {
-    username: "asmith",
-    email: "asmith@example.com",
-    role: "User",
-    firstName: "Alice",
-    lastName: "Smith",
-    registrationDate: "2024-10-15",
-    state: "Blocked",
-  },
-  {
-    username: "bwayne",
-    email: "bwayne@example.com",
-    role: "Moderator",
-    firstName: "Bruce",
-    lastName: "Wayne",
-    registrationDate: "2024-12-05",
-    state: "Active",
-  },
-];
-
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
 
@@ -43,16 +13,15 @@ const UserManagement: React.FC = () => {
 
     const fetchUsers = async () => {
       try {
+        console.log("Fetching users from API...");
         const response = await getUsers();
-        if (response && response.data) {
-          setUsers(response.data);
+        if (response) {
+          setUsers(response);
         } else {
-          console.log("No users found, using mock data.");
-          setUsers(mockUsers);
+          console.log("No users found");
         }
       } catch (error) {
         console.error("Error fetching users:", error);
-        setUsers(mockUsers);
       }
     };
 
@@ -62,7 +31,9 @@ const UserManagement: React.FC = () => {
   const handleEditUser = (updatedUser: User) => {
     if (!users) return;
     setUsers(
-      users.map((u) => (u.username === updatedUser.username ? updatedUser : u))
+      users.map((u) =>
+        u.user_name === updatedUser.user_name ? updatedUser : u
+      )
     );
   };
 

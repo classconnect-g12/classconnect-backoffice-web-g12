@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { TextField, TabNav } from "@radix-ui/themes";
-import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { TextField, TabNav, Callout, Flex, Text } from "@radix-ui/themes";
+import { InfoCircledIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import UserTable from "../components/UserTable";
 import { User } from "../types/user";
 import { getUsers } from "../services/userService";
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO! Make errors more user-friendly
-
     const fetchUsers = async () => {
       try {
         console.log("Fetching users from API...");
@@ -18,10 +17,18 @@ const UserManagement: React.FC = () => {
         if (response) {
           setUsers(response);
         } else {
-          console.log("No users found");
+          setError("No users found");
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        if (
+          error &&
+          typeof error === "object" &&
+          "status" in error &&
+          (error as { status?: number }).status === 401
+        ) {
+          setError("Error. Your session has expired. Please log in again.");
+          window.location.href = "/";
+        }
       }
     };
 
@@ -47,12 +54,22 @@ const UserManagement: React.FC = () => {
         </TabNav.Link>
       </TabNav.Root>
 
-      <TextField.Root placeholder="Search the users…" className="mt-10">
-        <TextField.Slot>
-          <MagnifyingGlassIcon height="16" width="16" />
-        </TextField.Slot>
-      </TextField.Root>
+      <div className="flex justify-end mt-10">
+        <TextField.Root placeholder="Search the users…" className="w-64">
+          <TextField.Slot>
+            <MagnifyingGlassIcon height="16" width="16" />
+          </TextField.Slot>
+        </TextField.Root>
+      </div>
 
+      {error && (
+        <Callout.Root color="red">
+          <Flex align="center" gap="2">
+            <InfoCircledIcon />
+            <Text color="red">{error}</Text>
+          </Flex>
+        </Callout.Root>
+      )}
       <div className="mt-10">
         <UserTable users={users} onEdit={handleEditUser} />
       </div>

@@ -1,7 +1,8 @@
-import { Grid, Spinner, TabNav } from "@radix-ui/themes";
+import { Grid, Spinner } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import AddAdminDialog from "../components/AddAdminDialog";
 import AdminCard from "../components/AdminCard";
+import TabNavigation from "../components/TabNavigation";
 
 interface Admin {
   email: string;
@@ -22,25 +23,16 @@ const AdminRegister: React.FC = () => {
       setIsLoading(false);
       setAdmins([
         {
-          email: "eve.holt@reqres.in",
-        },
-        {
-          email: "test@gmail.com",
+          email: "admin@classconnect.com",
         },
       ]);
-    }, 1500);
+    }, 1000);
     return () => clearTimeout(timeout);
   }, []);
 
   return (
     <div className="w-8/12 mx-auto">
-      <TabNav.Root>
-        <TabNav.Link href="#/home">Home</TabNav.Link>
-        <TabNav.Link href="#/admin-register" active>
-          Admin registration
-        </TabNav.Link>
-        <TabNav.Link href="#/user-management">User management</TabNav.Link>
-      </TabNav.Root>
+      <TabNavigation activeTab="admin-register" />
 
       <div className="mt-10 ml-10">
         <AddAdminDialog

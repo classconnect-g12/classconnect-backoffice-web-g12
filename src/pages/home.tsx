@@ -1,31 +1,12 @@
-import { TabNav } from "@radix-ui/themes";
-import { useNavigate } from "react-router-dom";
-import sessionService from "../services/sessionService";
+import TabNavigation from "../components/TabNavigation";
 
 const Home: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    sessionService.clearSession();
-    navigate("/");
-  };
 
   return (
     <>
       <div className="min-h-screen">
         <div className="w-8/12 mx-auto">
-          <TabNav.Root>
-            <TabNav.Link href="#/home" active>
-              Home
-            </TabNav.Link>
-            <TabNav.Link href="#/admin-register">
-              Admin registration
-            </TabNav.Link>
-            <TabNav.Link href="#/user-management">User management</TabNav.Link>
-            <TabNav.Link href="#/" onClick={handleLogout}>
-              <span className="text-red-500">Logout</span>
-            </TabNav.Link>
-          </TabNav.Root>
+          <TabNavigation activeTab="home"></TabNavigation>
 
           <div className="mt-4 p-4 border border-gray-300 rounded-md shadow-md bg-white">
             <h1 className="text-2xl font-bold text-gray-800">

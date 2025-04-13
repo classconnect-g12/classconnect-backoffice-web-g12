@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { TextField, TabNav, Callout, Flex, Text } from "@radix-ui/themes";
+import { TextField, Callout, Flex, Text } from "@radix-ui/themes";
 import { InfoCircledIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import UserTable from "../components/UserTable";
 import { User } from "../types/user";
 import { getUsers } from "../services/userService";
+import TabNavigation from "../components/TabNavigation";
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
@@ -46,13 +47,7 @@ const UserManagement: React.FC = () => {
 
   return (
     <div className="w-8/12 mx-auto">
-      <TabNav.Root>
-        <TabNav.Link href="#/home">Home</TabNav.Link>
-        <TabNav.Link href="#/admin-register">Admin registration</TabNav.Link>
-        <TabNav.Link href="#/user-management" active>
-          User management
-        </TabNav.Link>
-      </TabNav.Root>
+      <TabNavigation activeTab="user-management" />
 
       <div className="flex justify-end mt-10">
         <TextField.Root placeholder="Search the users…" className="w-64">

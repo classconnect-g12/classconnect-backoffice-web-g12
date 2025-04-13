@@ -2,7 +2,14 @@ import axios from "axios";
 
 export const getUsers = async () => {
   try {
-    const response = await axios.get("/users");
+    const response = await axios.get("https://classconnect-api-gateway-g12-production.up.railway.app/admin/users",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    console.log("Response from API:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -22,3 +29,37 @@ export const EditUser = async (permissions: string, rol: string) => {
     throw error;
   }
 };
+
+export const blockUser = async (userId: number) => {
+  try {
+    const response = await axios.post(
+      `https://classconnect-api-gateway-g12-production.up.railway.app/admin/ban/:${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error blocking user:", error);
+    throw error;
+  }
+}
+
+export const unblockUser = async (userId: number) => {
+  try {
+    const response = await axios.post(
+      `https://classconnect-api-gateway-g12-production.up.railway.app/admin/unban/:${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error unblocking user:", error);
+    throw error;
+  }
+}

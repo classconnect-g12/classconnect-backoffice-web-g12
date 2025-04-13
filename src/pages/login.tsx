@@ -36,7 +36,7 @@ const Login: React.FC = () => {
         (err as { status?: number }).status === 401
       ) {
         setError("Invalid password. Please try again.");
-      }else{
+      } else {
         setError("Invalid credentials. Please try again.");
       }
     } finally {
@@ -46,37 +46,39 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <Theme>
+      <Theme className="bg-gray-900 text-white">
         <div className="h-screen flex flex-col items-center justify-center px-4">
           {error ? (
-            <Callout.Root color="red" size="1" className="max-w-sm w-full">
+            <Callout.Root color="tomato" size="1" className="max-w-sm w-full">
               <Callout.Icon>
                 <InfoCircledIcon />
               </Callout.Icon>
               <Callout.Text>{error}</Callout.Text>
             </Callout.Root>
           ) : null}
-          <div className="text-white p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center space-y-5 border-2 border-gray-500 bg-gray-800">
-            <h1 className="text-white text-lg font-bold">
-              ClassConnect backOffice
-            </h1>
+          <div className="text-white p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center space-y-2 border-2 border-gray-500 bg-gray-800">
+            <img src="/public/classconnect-logo.png" alt="classconnect-logo" />
+            <h1 className="text-white text-lg font-bold">backoffice</h1>
+            <h2 className="text-white text-sm">Sign in to your account</h2>
             <form onSubmit={handleLogin} className="w-full">
               <div className="flex flex-col w-full">
-                <label htmlFor="" className="self-start">
-                  Admin email
+                <label htmlFor="" className="self-start text-sm">
+                  Email
                 </label>
                 <input
                   type="text"
+                  placeholder="Enter your email"
                   className="bg-white text-black p-2 rounded mb-4 mt-2"
                   required
                   value={user.email}
                   onChange={(e) => setUser({ ...user, email: e.target.value })}
                 />
-                <label htmlFor="" className="self-start">
-                  Admin password
+                <label htmlFor="" className="self-start text-sm">
+                  Password
                 </label>
                 <input
                   type="password"
+                  placeholder="Enter your password"
                   className="bg-white text-black p-2 rounded mb-4 mt-2"
                   required
                   value={user.password}

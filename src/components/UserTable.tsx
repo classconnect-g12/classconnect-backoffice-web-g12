@@ -129,13 +129,13 @@ const UserTable: React.FC<Props> = ({ users, onEdit }) => {
 
                           <div className="flex justify-end gap-3 mt-4">
                             <AlertDialog.Cancel>
-                              <button className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">
+                              <button className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 cursor-pointer">
                                 Cancel
                               </button>
                             </AlertDialog.Cancel>
                             <AlertDialog.Action>
                               <button
-                                className={`px-3 py-1 rounded text-white ${
+                                className={`px-3 py-1 rounded text-white cursor-pointer ${
                                   state === "Active"
                                     ? "bg-red-500 hover:bg-red-600"
                                     : "bg-green-500 hover:bg-green-600"

@@ -9,7 +9,6 @@ export const getUsers = async () => {
         },
       }
     );
-    console.log("Response from API:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -33,31 +32,34 @@ export const EditUser = async (permissions: string, rol: string) => {
 export const blockUser = async (userId: number) => {
   try {
     const response = await axios.post(
-      `https://classconnect-api-gateway-g12-production.up.railway.app/admin/ban/:${userId}`,
+      `https://classconnect-api-gateway-g12-production.up.railway.app/admin/ban/${userId}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error blocking user:", error);
     throw error;
   }
 }
 
+
 export const unblockUser = async (userId: number) => {
   try {
     const response = await axios.post(
-      `https://classconnect-api-gateway-g12-production.up.railway.app/admin/unban/:${userId}`,
+      `https://classconnect-api-gateway-g12-production.up.railway.app/admin/unban/${userId}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Error unblocking user:", error);
     throw error;

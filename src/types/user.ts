@@ -1,10 +1,12 @@
 export type User = {
-    username: string;
+    banned: boolean;
+    banner: string;
+    description: string;
     email: string;
+    id: number;
+    first_name: string;
+    last_name: string;
     role: string;
-    firstName: string;
-    lastName: string;
-    registrationDate: string;
-    state: "Active" | "Blocked";
+    user_name: string;
   };
   

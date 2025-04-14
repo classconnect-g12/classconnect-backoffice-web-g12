@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const login = async (username: string, password: string) => {
+const login = async (email: string, password: string) => {
   try {
-    const response = await axios.post('https://reqres.in/api/login', {
-      username,
+    const response = await axios.post('https://classconnect-api-gateway-g12-production.up.railway.app/admin/auth/login', {
+      email,
       password,
     });
     return response.data;
@@ -13,4 +13,25 @@ const login = async (username: string, password: string) => {
   }
 }
 
-export default login;
+const register = async (email: string, password: string) => {
+  try {
+    const response = await axios.post('https://classconnect-api-gateway-g12-production.up.railway.app/admin/auth/register',
+      {email,
+      password},
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("There was an error registering!", error);
+    throw error;
+  }
+}
+
+export default {
+  login,
+  register,
+};

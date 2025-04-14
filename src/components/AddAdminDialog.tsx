@@ -8,25 +8,30 @@ import {
   TextField,
   Callout,
 } from "@radix-ui/themes";
+import authService from "../services/authService";
+import sessionService from "../services/sessionService";
+import toast from "react-hot-toast";
 
 interface AddAdminDialogProps {
-  newAdmin: { username: string; email: string; password: string };
+  newAdmin: { email: string; password: string };
   setNewAdmin: React.Dispatch<
-    React.SetStateAction<{ username: string; email: string; password: string }>
+    React.SetStateAction<{ email: string; password: string }>
   >;
-  handleAddAdmin: () => void;
+  onAdminAdded: (email: string) => void;
 }
 
 const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
   newAdmin,
   setNewAdmin,
-  handleAddAdmin,
+  onAdminAdded,
 }) => {
   const [error, setError] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const validateFields = () => {
-    if (!newAdmin.username || !newAdmin.email || !newAdmin.password) {
+    if (!newAdmin.email || !newAdmin.password || !confirmPassword) {
       setError("All fields are required.");
       return false;
     }
@@ -34,24 +39,66 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
       setError("Invalid email address.");
       return false;
     }
-    setError("");
+    if (newAdmin.password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return false;
+    }
+    if (newAdmin.password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return false;
+    }
     return true;
   };
 
-  const onAddAdminClick = () => {
-    if (validateFields()) {
-      handleAddAdmin();
-      setIsOpen(false);
+  const onAddAdminClick = async () => {
+    
+    if (!validateFields()) return;
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const response = await authService.register(
+        newAdmin.email,
+        newAdmin.password
+      );
+      if (response.status === 201) {
+        onAdminAdded(newAdmin.email);
+        toast.success("Admin added successfully.");
+        setIsOpen(false);
+        setNewAdmin({ email: "", password: "" });
+      } else {
+        setError("Unexpected error occurred.");
+      }
+    } catch (err) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "status" in err &&
+        (err as { status?: number }).status === 409
+      ) {
+        setError("Admin already exists.");
+      } else if (
+        err &&
+        typeof err === "object" &&
+        "status" in err &&
+        (err as { status?: number }).status === 401
+      ) {
+        setError("Error. Your session has expired. Please log in again.");
+        sessionService.clearSession();
+        window.location.href = "/";
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
       <Dialog.Trigger>
-        <Button
-          onClick={() => setIsOpen(true)}
-          style={{ cursor: "pointer" }}
-        >
+        <Button onClick={() => setIsOpen(true)} style={{ cursor: "pointer" }}>
           <PlusIcon /> Add Administrator
         </Button>
       </Dialog.Trigger>
@@ -65,34 +112,20 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
         <Flex direction="column" gap="3">
           {error && (
             <Callout.Root color="red">
-              <Callout.Text>
-                <Flex align="center" gap="2">
-                  <InfoCircledIcon />
-                  {error}
-                </Flex>
-              </Callout.Text>
+              <Flex align="center" gap="2">
+                <InfoCircledIcon />
+                <Text color="red">{error}</Text>
+              </Flex>
             </Callout.Root>
           )}
 
-          <label>
-            <Text size="2" mb="1" weight="bold">
-              Username
-            </Text>
-            <TextField.Root
-              autoFocus
-              type="text"
-              value={newAdmin.username}
-              onChange={(e) =>
-                setNewAdmin({ ...newAdmin, username: e.target.value })
-              }
-            />
-          </label>
           <label>
             <Text size="2" mb="1" weight="bold">
               Email
             </Text>
             <TextField.Root
               type="email"
+              placeholder="Enter admin email"
               value={newAdmin.email}
               onChange={(e) =>
                 setNewAdmin({ ...newAdmin, email: e.target.value })
@@ -105,22 +138,45 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
             </Text>
             <TextField.Root
               type="password"
+              placeholder="Enter admin password"
               value={newAdmin.password}
               onChange={(e) =>
                 setNewAdmin({ ...newAdmin, password: e.target.value })
               }
             />
           </label>
+          <label>
+            <Text size="2" mb="1" weight="bold">
+              Confirm Password
+            </Text>
+            <TextField.Root
+              type="password"
+              placeholder="Confirm admin password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </label>
         </Flex>
 
         <Flex gap="3" mt="4" justify="end">
           <Dialog.Close>
-            <Button onClick={() => setError("")} variant="soft" color="gray" style={{ cursor: "pointer" }}>
+            <Button
+              onClick={() => {
+                setError("");
+              }}
+              variant="soft"
+              color="gray"
+              style={{ cursor: "pointer" }}
+            >
               Cancel
             </Button>
           </Dialog.Close>
-          <Button onClick={onAddAdminClick} style={{ cursor: "pointer" }}>
-            Add
+          <Button
+            onClick={onAddAdminClick}
+            disabled={isSubmitting}
+            style={{ cursor: isSubmitting ? "default" : "pointer" }}
+          >
+            {isSubmitting ? "Adding..." : "Add"}
           </Button>
         </Flex>
       </Dialog.Content>

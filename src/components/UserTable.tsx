@@ -9,6 +9,7 @@ import UserEditDialog from "./UserEditDialog";
 import { User } from "../types/user";
 import { blockUser } from "../services/userService";
 import { unblockUser } from "../services/userService";
+import toast from "react-hot-toast";
 
 type Props = {
   users: User[] | null;
@@ -32,22 +33,33 @@ const UserTable: React.FC<Props> = ({ users, onEdit }) => {
   );
 
   const handleToggleBlock = async (user: User) => {
-
     if (!user.banned) {
       const response = await blockUser(user.id);
-        if (response.status === 200) {
-          console.log("User blocked successfully.");
-        } else {
-          console.error("Failed to block user.");
-        }
-      }else{
-        const response = await unblockUser(user.id);
-        if (response.status === 200) {
-          console.log("User unblocked successfully.");
-        } else {
-          console.error("Failed to unblock user.");
-        }
+      if (response.status === 200) {
+        toast.success("User blocked successfully.");
+      } else if (response.status === 401) {
+        toast.error("You are not authorized to perform this action.");
+      } else if (response.status === 403) {
+        toast.error("You are not allowed to perform this action.");
+      } else if (response.status === 404) {
+        toast.error("User not found.");
+      } else {
+        console.error("Failed to block user.");
       }
+    } else {
+      const response = await unblockUser(user.id);
+      if (response.status === 200) {
+        toast.success("User unblocked successfully.");
+      } else if (response.status === 401) { 
+        toast.error("You are not authorized to perform this action.");
+      } else if (response.status === 403) {
+        toast.error("You are not allowed to perform this action.");
+      } else if (response.status === 404) {
+        toast.error("User not found.");
+      } else {
+        console.error("Failed to unblock user.");
+      }
+    }
     const updatedUser: User = {
       ...user,
       banned: !user.banned,

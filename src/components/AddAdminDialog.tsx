@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/themes";
 import authService from "../services/authService";
 import sessionService from "../services/sessionService";
+import toast from "react-hot-toast";
 
 interface AddAdminDialogProps {
   newAdmin: { email: string; password: string };
@@ -62,6 +63,7 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({
       );
       if (response.status === 201) {
         onAdminAdded(newAdmin.email);
+        toast.success("Admin added successfully.");
         setIsOpen(false);
         setNewAdmin({ email: "", password: "" });
       } else {

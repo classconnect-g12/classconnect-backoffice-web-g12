@@ -24,7 +24,7 @@ const register = async (email: string, password: string) => {
         },
       }
     );
-    return response.data;
+    return response;
   } catch (error) {
     console.error("There was an error registering!", error);
     throw error;

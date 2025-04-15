@@ -50,7 +50,7 @@ const UserTable: React.FC<Props> = ({ users, onEdit }) => {
       const response = await unblockUser(user.id);
       if (response.status === 200) {
         toast.success("User unblocked successfully.");
-      } else if (response.status === 401) { 
+      } else if (response.status === 401) {
         toast.error("You are not authorized to perform this action.");
       } else if (response.status === 403) {
         toast.error("You are not allowed to perform this action.");
@@ -77,6 +77,7 @@ const UserTable: React.FC<Props> = ({ users, onEdit }) => {
           <Table.ColumnHeaderCell>Role</Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>First Name</Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>Last Name</Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>Create at</Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>State</Table.ColumnHeaderCell>
           <Table.ColumnHeaderCell>Actions</Table.ColumnHeaderCell>
         </Table.Row>
@@ -96,6 +97,9 @@ const UserTable: React.FC<Props> = ({ users, onEdit }) => {
                   <Table.Cell>{user.first_name}</Table.Cell>
                   <Table.Cell>{user.last_name}</Table.Cell>
                   <Table.Cell>
+                    {new Date(user.created_at).toLocaleDateString("en-CA")}
+                  </Table.Cell>
+                  <Table.Cell>
                     <Badge color={state === "Active" ? "green" : "red"}>
                       {state}
                     </Badge>
@@ -105,8 +109,8 @@ const UserTable: React.FC<Props> = ({ users, onEdit }) => {
                       <Dialog.Root>
                         <Dialog.Trigger>
                           <Pencil1Icon
-                            className="w-6 h-6 p-1 border text-blue-500 rounded cursor-pointer hover:border-green-500 hover:text-green-500 transition"
-                            onClick={() => setSelectedUser(user)}
+                            className="w-6 h-6 p-1 border text-blue-500 rounded cursor-wait hover:border-green-500 hover:text-green-500 transition"
+                            //onClick={() => setSelectedUser(user)}
                           />
                         </Dialog.Trigger>
                         {selectedUser?.user_name === user.user_name && (

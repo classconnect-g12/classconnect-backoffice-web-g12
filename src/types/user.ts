@@ -8,5 +8,6 @@ export type User = {
     last_name: string;
     role: string;
     user_name: string;
+    created_at: string;
   };
   

@@ -15,6 +15,12 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     setIsLoading(true);
     e.preventDefault();
+    const isValidEmail = /^\S+@\S+\.\S+$/.test(user.email);
+    if (!isValidEmail) {
+      setError("Please enter a valid email address.");
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await authService.login(user.email, user.password);
       if (response && response.token) {
@@ -57,7 +63,7 @@ const Login: React.FC = () => {
             </Callout.Root>
           ) : null}
           <div className="text-white p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center space-y-2 border-2 border-gray-500 bg-gray-800">
-            <img src="/public/classconnect-logo.png" alt="classconnect-logo" />
+            <img src="/classconnect-logo.png" alt="classconnect-logo" />
             <h1 className="text-white text-lg font-bold">backoffice</h1>
             <h2 className="text-white text-sm">Sign in to your account</h2>
             <form onSubmit={handleLogin} className="w-full">

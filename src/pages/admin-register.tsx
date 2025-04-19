@@ -1,10 +1,9 @@
-import { Grid, Spinner } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import AddAdminDialog from "../components/AddAdminDialog";
-import AdminCard from "../components/AdminCard";
 import TabNavigation from "../components/TabNavigation";
 import { getAdmins } from "../services/adminService";
 import sessionService from "../services/sessionService";
+import AdminTable from "../components/AdminTable";
 
 interface Admin {
   id: string;
@@ -74,17 +73,7 @@ const AdminRegister: React.FC = () => {
 
       {error && <div className="text-red-500 text-center mt-4">{error}</div>}
 
-      {isLoading ? (
-        <div className="flex justify-center mt-10">
-          <Spinner size="3" className="mt-10" />
-        </div>
-      ) : (
-        <Grid columns="3" gap="4" width="auto" className="mt-10 ml-10">
-          {admins.map((admin, index) => (
-            <AdminCard key={index} email={admin.email} />
-          ))}
-        </Grid>
-      )}
+      <AdminTable admins={admins} isLoading={isLoading} />
     </div>
   );
 };

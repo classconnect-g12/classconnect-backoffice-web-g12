@@ -1,7 +1,8 @@
 import { useState } from "react";
 import authService from "../services/authService";
-import { Callout, Spinner, Theme } from "@radix-ui/themes";
+import { Callout, Spinner } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
+import { EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 
 const Login: React.FC = () => {
   const [user, setUser] = useState({
@@ -11,6 +12,7 @@ const Login: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     setIsLoading(true);
@@ -28,23 +30,17 @@ const Login: React.FC = () => {
         window.location.href = "/#/home";
       }
     } catch (err) {
-      if (
-        err &&
-        typeof err === "object" &&
-        "status" in err &&
-        (err as { status?: number }).status === 404
-      ) {
-        setError("User not found. Please check your email.");
-      } else if (
-        err &&
-        typeof err === "object" &&
-        "status" in err &&
-        (err as { status?: number }).status === 401
-      ) {
-        setError("Invalid password. Please try again.");
-      } else {
-        setError("Invalid credentials. Please try again.");
+      interface ErrorResponse {
+        response?: {
+          data?: {
+            detail?: string;
+          };
+        };
       }
+      const detail =
+        (err as ErrorResponse)?.response?.data?.detail ||
+        "An unexpected error occurred.";
+      setError(detail);
     } finally {
       setIsLoading(false);
     }
@@ -52,40 +48,44 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <Theme className="bg-gray-900 text-white">
-        <div className="h-screen flex flex-col items-center justify-center px-4">
-          {error ? (
-            <Callout.Root color="tomato" size="1" className="max-w-sm w-full">
-              <Callout.Icon>
-                <InfoCircledIcon />
-              </Callout.Icon>
-              <Callout.Text>{error}</Callout.Text>
-            </Callout.Root>
-          ) : null}
-          <div className="text-white p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center space-y-2 border-2 border-gray-500 bg-gray-800">
-            <img src="/classconnect-logo.png" alt="classconnect-logo" />
-            <h1 className="text-white text-lg font-bold">backoffice</h1>
-            <h2 className="text-white text-sm">Sign in to your account</h2>
-            <form onSubmit={handleLogin} className="w-full">
-              <div className="flex flex-col w-full">
-                <label htmlFor="" className="self-start text-sm">
-                  Email
-                </label>
+      <div className="h-screen flex flex-col items-center justify-center px-4">
+        <div className="p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center border-2 border-gray-500 shadow-2xl bg-white">
+          <img src="/classconnect-logo.png" alt="classconnect-logo" />
+          <h1 className="text-lg font-bold">backoffice</h1>
+          <h2 className="text-sm">Sign in to your account</h2>
+          <form onSubmit={handleLogin} className="w-full">
+            {error ? (
+              <Callout.Root
+                color="tomato"
+                size="1"
+                className="max-w-sm w-full mt-2 mb-2"
+              >
+                <Callout.Icon>
+                  <InfoCircledIcon />
+                </Callout.Icon>
+                <Callout.Text>{error}</Callout.Text>
+              </Callout.Root>
+            ) : null}
+            <div className="flex flex-col w-full">
+              <label htmlFor="" className="self-start text-sm">
+                Email
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your email"
+                className="border-1 border-gray-500 p-2 rounded mb-4 mt-2 placeholder:text-sm text-sm"
+                required
+                value={user.email}
+                onChange={(e) => setUser({ ...user, email: e.target.value })}
+              />
+              <label htmlFor="" className="self-start text-sm">
+                Password
+              </label>
+              <div className="relative w-full">
                 <input
-                  type="text"
-                  placeholder="Enter your email"
-                  className="bg-white text-black p-2 rounded mb-4 mt-2"
-                  required
-                  value={user.email}
-                  onChange={(e) => setUser({ ...user, email: e.target.value })}
-                />
-                <label htmlFor="" className="self-start text-sm">
-                  Password
-                </label>
-                <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="bg-white text-black p-2 rounded mb-4 mt-2"
+                  className="border-1 border-gray-500 p-2 rounded mb-4 mt-2 placeholder:text-sm text-sm w-full pr-10"
                   required
                   value={user.password}
                   onChange={(e) =>
@@ -93,22 +93,31 @@ const Login: React.FC = () => {
                   }
                 />
                 <button
-                  type="submit"
-                  disabled={isLoading}
-                  className={`p-2 rounded w-full cursor-pointer transition mt-4 flex items-center justify-center
-                        ${
-                          isLoading
-                            ? "bg-black cursor-wait"
-                            : "bg-gray-600 hover:bg-green-600 text-white"
-                        }`}
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-2 top-1/2 pb-2 transform -translate-y-1/2 text-gray-600 hover:text-black"
+                  tabIndex={-1}
                 >
-                  {isLoading ? <Spinner size="3" /> : "Sign in"}
+                  {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
                 </button>
               </div>
-            </form>
-          </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`p-2 rounded w-full cursor-pointer transition mt-4 flex items-center justify-center
+                  ${
+                    isLoading
+                      ? "bg-black text-white cursor-wait"
+                      : "bg-gray-600 hover:bg-green-600 text-white"
+                  }`}
+              >
+                {isLoading ? <Spinner size="3" /> : "Sign in"}
+              </button>
+            </div>
+          </form>
         </div>
-      </Theme>
+      </div>
     </>
   );
 };

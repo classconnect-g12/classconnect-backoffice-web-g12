@@ -1,91 +1,79 @@
-import { Grid, Spinner, TabNav } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import AddAdminDialog from "../components/AddAdminDialog";
-import AdminCard from "../components/AdminCard";
+import TabNavigation from "../components/TabNavigation";
+import { getAdmins } from "../services/adminService";
+import sessionService from "../services/sessionService";
+import AdminTable from "../components/AdminTable";
 
 interface Admin {
-  username: string;
+  id: string;
   email: string;
-  status: "Authorized" | "Blocked";
+  role: string;
 }
 
 const AdminRegister: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [newAdmin, setNewAdmin] = useState({
-    username: "",
     email: "",
     password: "",
   });
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    // TODO! Fetch the list of admins from the API
-    // Simulating an API call with a timeout
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-      setAdmins([
-        {
-          username: "Eve",
-          email: "eve.holt@reqres.in",
-          status: "Authorized",
-        },
-        {
-          username: "TestUser",
-          email: "test@gmail.com",
-          status: "Blocked",
-        },
-      ]);
-    }, 1500);
-    return () => clearTimeout(timeout);
-  }, []);
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      try {
+        console.log("Fetching admins from API...");
+        const response = await getAdmins();
+        if (response) {
+          setAdmins(response);
+        } else {
+          setError("No admins found");
+        }
+      } catch (error) {
+        if (
+          error &&
+          typeof error === "object" &&
+          "status" in error &&
+          (error as { status?: number }).status === 401
+        ) {
+          setError("Error. Your session has expired. Please log in again.");
+          sessionService.clearSession();
+          window.location.href = "/";
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleAddAdmin = () => {
-    //TODO! Add API call to register the new admin
-    setAdmins([
-      ...admins,
-      {
-        username: newAdmin.username,
-        email: newAdmin.email,
-        status: "Authorized",
-      },
-    ]);
-    setNewAdmin({ username: "", email: "", password: "" });
-  };
+    fetchUsers();
+  }, []);
 
   return (
     <div className="w-8/12 mx-auto">
-      <TabNav.Root>
-        <TabNav.Link href="#/home">Home</TabNav.Link>
-        <TabNav.Link href="#/admin-register" active>
-          Admin registration
-        </TabNav.Link>
-        <TabNav.Link href="#/user-management">User management</TabNav.Link>
-      </TabNav.Root>
+      <TabNavigation activeTab="admin-register" />
 
       <div className="mt-10 ml-10">
         <AddAdminDialog
           newAdmin={newAdmin}
           setNewAdmin={setNewAdmin}
-          handleAddAdmin={handleAddAdmin}
+          onAdminAdded={(email) =>
+            setAdmins((prev) => [
+              ...prev,
+              {
+                id: crypto.randomUUID(),
+                email,
+                role: "ADMIN",
+              },
+            ])
+          }
         />
       </div>
 
-      {isLoading ? (
-        <div className="flex justify-center mt-10">
-          <Spinner size="3" className="mt-10" />
-        </div>
-      ) : (
-        <Grid columns="3" gap="4" width="auto" className="mt-10 ml-10">
-          {admins.map((admin, index) => (
-            <AdminCard
-              key={index}
-              username={admin.username}
-              email={admin.email}
-              status={admin.status}
-            />
-          ))}
-        </Grid>
-      )}
+      {error && <div className="text-red-500 text-center mt-4">{error}</div>}
+
+      <AdminTable admins={admins} isLoading={isLoading} />
     </div>
   );
 };

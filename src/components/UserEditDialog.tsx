@@ -15,43 +15,21 @@ type Props = {
 };
 
 const UserEditDialog: React.FC<Props> = ({ user, onSave }) => {
-  const [firstName, setFirstName] = React.useState(user.firstName);
-  const [lastName, setLastName] = React.useState(user.lastName);
-  const [email, setEmail] = React.useState(user.email);
+  const [email, setEmail] = React.useState("");
 
   const handleSave = () => {
     // TODO! Make API call to update user details
-    // await userService.updateUserDetails(user.username, updatedUser);
-
-    onSave({ ...user, firstName, lastName, email });
+    onSave({ ...user, email });
   };
 
   return (
     <Dialog.Content maxWidth="450px">
       <Dialog.Title>Edit user</Dialog.Title>
       <Dialog.Description size="2" mb="4">
-        Make changes to {user.username}'s profile.
+        Make changes to {user.user_name}'s profile.
       </Dialog.Description>
 
       <Flex direction="column" gap="3">
-        <label>
-          <Text as="div" size="2" mb="1" weight="bold">
-            First Name
-          </Text>
-          <TextField.Root
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-        </label>
-        <label>
-          <Text as="div" size="2" mb="1" weight="bold">
-            Last Name
-          </Text>
-          <TextField.Root
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </label>
         <label>
           <Text as="div" size="2" mb="1" weight="bold">
             Email

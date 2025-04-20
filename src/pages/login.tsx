@@ -1,28 +1,46 @@
 import { useState } from "react";
-import login from "../services/authService";
+import authService from "../services/authService";
 import { Callout, Spinner } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
+import { EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 
 const Login: React.FC = () => {
   const [user, setUser] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     setIsLoading(true);
     e.preventDefault();
+    const isValidEmail = /^\S+@\S+\.\S+$/.test(user.email);
+    if (!isValidEmail) {
+      setError("Please enter a valid email address.");
+      setIsLoading(false);
+      return;
+    }
     try {
-      const response = await login(user.username, user.password);
+      const response = await authService.login(user.email, user.password);
       if (response && response.token) {
         localStorage.setItem("token", response.token);
         window.location.href = "/#/home";
       }
     } catch (err) {
-      setError((err as Error).message || "Login failed. Please try again.");
+      interface ErrorResponse {
+        response?: {
+          data?: {
+            detail?: string;
+          };
+        };
+      }
+      const detail =
+        (err as ErrorResponse)?.response?.data?.detail ||
+        "An unexpected error occurred.";
+      setError(detail);
     } finally {
       setIsLoading(false);
     }
@@ -31,49 +49,68 @@ const Login: React.FC = () => {
   return (
     <>
       <div className="h-screen flex flex-col items-center justify-center px-4">
-        {error ? (
-          <Callout.Root color="red" size="1" className="max-w-sm w-full">
-            <Callout.Icon>
-              <InfoCircledIcon />
-            </Callout.Icon>
-            <Callout.Text>{error}</Callout.Text>
-          </Callout.Root>
-        ) : null}
-        <div className="text-white p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center space-y-5 border-2 border-gray-500 bg-gray-800">
-          <h1 className="text-white text-lg font-bold">
-            ClassConnect backOffice
-          </h1>
+        <div className="p-5 w-full max-w-sm rounded-lg flex flex-col items-center justify-center border-2 border-gray-500 shadow-2xl bg-white">
+          <img src="/classconnect-logo.png" alt="classconnect-logo" />
+          <h1 className="text-lg font-bold">backoffice</h1>
+          <h2 className="text-sm">Sign in to your account</h2>
           <form onSubmit={handleLogin} className="w-full">
+            {error ? (
+              <Callout.Root
+                color="tomato"
+                size="1"
+                className="max-w-sm w-full mt-2 mb-2"
+              >
+                <Callout.Icon>
+                  <InfoCircledIcon />
+                </Callout.Icon>
+                <Callout.Text>{error}</Callout.Text>
+              </Callout.Root>
+            ) : null}
             <div className="flex flex-col w-full">
-              <label htmlFor="" className="self-start">
-                Admin username
+              <label htmlFor="" className="self-start text-sm">
+                Email
               </label>
               <input
                 type="text"
-                className="bg-white text-black p-2 rounded mb-4 mt-2"
+                placeholder="Enter your email"
+                className="border-1 border-gray-500 p-2 rounded mb-4 mt-2 placeholder:text-sm text-sm"
                 required
-                value={user.username}
-                onChange={(e) => setUser({ ...user, username: e.target.value })}
+                value={user.email}
+                onChange={(e) => setUser({ ...user, email: e.target.value })}
               />
-              <label htmlFor="" className="self-start">
-                Admin password
+              <label htmlFor="" className="self-start text-sm">
+                Password
               </label>
-              <input
-                type="password"
-                className="bg-white text-black p-2 rounded mb-4 mt-2"
-                required
-                value={user.password}
-                onChange={(e) => setUser({ ...user, password: e.target.value })}
-              />
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="border-1 border-gray-500 p-2 rounded mb-4 mt-2 placeholder:text-sm text-sm w-full pr-10"
+                  required
+                  value={user.password}
+                  onChange={(e) =>
+                    setUser({ ...user, password: e.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-2 top-1/2 pb-2 transform -translate-y-1/2 text-gray-600 hover:text-black"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                </button>
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
                 className={`p-2 rounded w-full cursor-pointer transition mt-4 flex items-center justify-center
-                        ${
-                          isLoading
-                            ? "bg-black cursor-wait"
-                            : "bg-gray-600 hover:bg-green-600 text-white"
-                        }`}
+                  ${
+                    isLoading
+                      ? "bg-black text-white cursor-wait"
+                      : "bg-gray-600 hover:bg-green-600 text-white"
+                  }`}
               >
                 {isLoading ? <Spinner size="3" /> : "Sign in"}
               </button>

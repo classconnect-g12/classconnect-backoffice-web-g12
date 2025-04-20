@@ -88,8 +88,3 @@ docker rmi classconnect-backoffice
 ## 🌐 Despliegue
 
 El proyecto está configurado para ser desplegado en Railway. El despliegue se realiza automáticamente cuando se hace push a la rama main.
-
-### Variables de entorno
-
-- `PORT`: Puerto en el que se ejecutará la aplicación (por defecto: 80)
-- `NODE_ENV`: Entorno de ejecución (development/production)

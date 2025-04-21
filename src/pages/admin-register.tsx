@@ -4,6 +4,7 @@ import TabNavigation from "../components/TabNavigation";
 import { getAdmins } from "../services/adminService";
 import sessionService from "../services/sessionService";
 import AdminTable from "../components/AdminTable";
+import { useSearchParams } from "react-router-dom";
 
 interface Admin {
   id: string;
@@ -19,15 +20,28 @@ const AdminRegister: React.FC = () => {
     password: "",
   });
   const [error, setError] = useState<string>("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const rawPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
 
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
-        console.log("Fetching admins from API...");
-        const response = await getAdmins();
-        if (response) {
-          setAdmins(response);
+        const response = await getAdmins(currentPage - 1);
+        if (response && response.admins && response.pagination) {
+          const total = response.pagination.total_pages;
+          setAdmins(response.admins);
+          setTotalPages(total);
+
+          if (currentPage > total && total > 0) {
+            setSearchParams({ page: String(total) });
+          }
+          if (currentPage < 1) {
+            setSearchParams({ page: "1" });
+          }
         } else {
           setError("No admins found");
         }
@@ -48,7 +62,19 @@ const AdminRegister: React.FC = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [currentPage, setSearchParams]);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setSearchParams({ page: String(currentPage + 1) });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setSearchParams({ page: String(currentPage - 1) });
+    }
+  };
 
   return (
     <div className="w-8/12 mx-auto">
@@ -74,6 +100,31 @@ const AdminRegister: React.FC = () => {
       {error && <div className="text-red-500 text-center mt-4">{error}</div>}
 
       <AdminTable admins={admins} isLoading={isLoading} />
+
+      <div className="flex justify-center gap-4 mt-8">
+        <button
+          disabled={currentPage === 1}
+          onClick={handlePrevPage}
+          className="px-3 text-sm font-semibold rounded-lg bg-blue-500 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          Previous
+        </button>
+
+        <div>
+          <p className="font-medium text-gray-800">
+            Page <span className="font-bold">{currentPage}</span> of{" "}
+            <span className="font-bold">{totalPages}</span>
+          </p>
+        </div>
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={handleNextPage}
+          className="px-3 text-sm font-semibold rounded-lg bg-blue-500 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

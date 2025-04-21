@@ -20,6 +20,15 @@ Este proyecto está construido con **React**, **TypeScript** y **Vite**, usando 
 
 ## 🛠 Cómo levantar el proyecto
 
+### Env
+
+Para el despliegue se usó el siguiente .env
+
+```bash
+VITE_API_URL=https://classconnect-api-gateway-g12-production.up.railway.app
+VITE_LIMIT_PAGE=5
+```
+
 ### Opción 1: Desarrollo local
 
 1. Clona el repositorio:

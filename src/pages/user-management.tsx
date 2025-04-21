@@ -6,18 +6,32 @@ import { User } from "../types/user";
 import { getUsers } from "../services/userService";
 import TabNavigation from "../components/TabNavigation";
 import sessionService from "../services/sessionService";
+import { useSearchParams } from "react-router-dom";
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const rawPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        console.log("Fetching users from API...");
-        const response = await getUsers();
-        if (response) {
-          setUsers(response);
+        const response = await getUsers(currentPage - 1);
+        if (response && response.users && response.pagination) {
+          const total = response.pagination.total_pages;
+          setUsers(response.users);
+          setTotalPages(total);
+
+          if (currentPage > total && total > 0) {
+            setSearchParams({ page: String(total) });
+          }
+          if (currentPage < 1) {
+            setSearchParams({ page: "1" });
+          }
         } else {
           setError("No users found");
         }
@@ -36,7 +50,7 @@ const UserManagement: React.FC = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [currentPage, setSearchParams]);
 
   const handleEditUser = (updatedUser: User) => {
     if (!users) return;
@@ -45,6 +59,18 @@ const UserManagement: React.FC = () => {
         u.user_name === updatedUser.user_name ? updatedUser : u
       )
     );
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setSearchParams({ page: String(currentPage + 1) });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setSearchParams({ page: String(currentPage - 1) });
+    }
   };
 
   return (
@@ -69,6 +95,31 @@ const UserManagement: React.FC = () => {
       )}
       <div className="mt-10">
         <UserTable users={users} onEdit={handleEditUser} />
+      </div>
+
+      <div className="flex justify-center gap-4 mt-8">
+        <button
+          disabled={currentPage === 1}
+          onClick={handlePrevPage}
+          className="px-3 text-sm font-semibold rounded-lg bg-blue-500 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          Previous
+        </button>
+
+        <div>
+          <p className="font-medium text-gray-800">
+            Page <span className="font-bold">{currentPage}</span> of{" "}
+            <span className="font-bold">{totalPages}</span>
+          </p>
+        </div>
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={handleNextPage}
+          className="px-3 text-sm font-semibold rounded-lg bg-blue-500 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

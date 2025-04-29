@@ -4,6 +4,12 @@ import { Callout, Spinner } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 
+const API_URL = import.meta.env.VITE_API_URL;
+const LIMIT_PAGE = Number(import.meta.env.VITE_LIMIT_PAGE);
+
+console.log("VITE_API_URL:", API_URL);
+console.log("VITE_LIMIT_PAGE:", LIMIT_PAGE);
+
 const Login: React.FC = () => {
   const [user, setUser] = useState({
     email: "",

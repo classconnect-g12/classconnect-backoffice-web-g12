@@ -3,6 +3,9 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
+ARG VITE_API_URL
+ARG VITE_LIMIT_PAGE
+
 # Copiar archivos de dependencias
 COPY package*.json ./
 

@@ -4,7 +4,6 @@ import { Callout, Spinner } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 
-
 const Login: React.FC = () => {
   const [user, setUser] = useState({
     email: "",

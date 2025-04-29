@@ -6,9 +6,6 @@ WORKDIR /app
 ARG VITE_API_URL
 ARG VITE_LIMIT_PAGE
 
-ENV VITE_API_URL=${VITE_API_URL}
-ENV VITE_LIMIT_PAGE=${VITE_LIMIT_PAGE}
-
 # Copiar archivos de dependencias
 COPY package*.json ./
 

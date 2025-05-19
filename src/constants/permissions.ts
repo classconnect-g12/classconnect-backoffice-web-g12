@@ -1,0 +1,14 @@
+export const PERMISSION_LABELS: Record<string, string> = {
+  CREATE_ASSESSMENT: "Create Assessment",
+  CREATE_RESOURCE: "Create Resource",
+  CREATE_MODULE: "Create Module",
+  DELETE_COURSE: "Delete Course",
+  EDIT_COURSE: "Edit Course",
+  EDIT_MODULE: "Edit Module",
+  DELETE_MODULE: "Delete Module",
+  EDIT_RESOURCE: "Edit Resource",
+  DELETE_RESOURCE: "Delete Resource",
+  EDIT_ASSESSMENT: "Edit Assessment",
+  DELETE_ASSESMENT: "Delete Assessment",
+  REVIEW_ASSESSMENT: "Review Assessment",
+};

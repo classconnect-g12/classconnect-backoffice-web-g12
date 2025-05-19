@@ -5,6 +5,10 @@ import UserManagement from "./pages/user-management";
 import AdminRegister from "./pages/admin-register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import { CourseManagement } from "./pages/course-management";
+import MembersPage from "./pages/course/members/membersPage";
+import { CourseLogs } from "./pages/course/courseLogs/courseLogs";
+
 
 function App() {
   return (
@@ -36,6 +40,14 @@ function App() {
             }
           />
           <Route
+            path="/course-management"
+            element={
+              <ProtectedRoute>
+                <CourseManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/home"
             element={
               <ProtectedRoute>
@@ -44,6 +56,28 @@ function App() {
             }
           />
         </Routes>
+        <Routes>
+          <Route 
+            path="/course/:courseId/members" 
+            element={
+              <ProtectedRoute>
+                <MembersPage />
+              </ProtectedRoute>
+            }
+            />
+        </Routes>
+        <Routes>
+            <Route 
+            path="/course/:courseId/logs" 
+            element={
+              <ProtectedRoute>
+                <CourseLogs />
+              </ProtectedRoute>
+            } 
+            />
+        </Routes>
+  
+
       </Router>
     </>
   );

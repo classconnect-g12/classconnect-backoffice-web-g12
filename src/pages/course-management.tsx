@@ -1,64 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { TextField, Callout, Flex, Text } from "@radix-ui/themes";
-import { InfoCircledIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import UserTable from "../components/UserTable";
-import { User } from "../types/user";
-import { getUsers } from "../services/userService";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import TabNavigation from "../components/TabNavigation";
-import sessionService from "../services/sessionService";
-import { useSearchParams } from "react-router-dom";
+import { TextField, Callout, Flex, Text } from "@radix-ui/themes";
+import { MagnifyingGlassIcon, InfoCircledIcon } from "@radix-ui/react-icons";
+import { CourseTable } from "../components/CourseTable";
+import { getCourses } from "../services/courseService";
 
-const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<User[] | null>(null);
+type Course = {
+  id: string;
+  title: string;
+  description: string;
+  capacity: number;
+  startDate: string;
+  endDate: string;
+  correlatives: { id: string; title: string }[];
+};
+
+export function CourseManagement() {
+  const [courses, setCourses] = useState<Course[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const rawPage = parseInt(searchParams.get("page") || "1", 10);
   const currentPage = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchCourses = async () => {
       try {
-        const response = await getUsers(currentPage - 1);
-        if (response && response.users && response.pagination) {
-          const total = response.pagination.total_pages;
-          setUsers(response.users);
-          setTotalPages(total);
+        const response = await getCourses(currentPage - 1);
+        if (response && response.courses && response.pagination) {
+          const { courses, pagination } = response;
+          setCourses(courses);
+          setTotalPages(pagination.totalPages);
 
-          if (currentPage > total && total > 0) {
-            setSearchParams({ page: String(total) });
+          if (currentPage > pagination.totalPages && pagination.totalPages > 0) {
+            setSearchParams({ page: String(pagination.totalPages) });
           }
           if (currentPage < 1) {
             setSearchParams({ page: "1" });
           }
         } else {
-          setError("No users found");
+          setError("No courses found");
         }
-      } catch (error) {
-        if (
-          error &&
-          typeof error === "object" &&
-          "status" in error &&
-          (error as { status?: number }).status === 401
-        ) {
-          setError("Error. Your session has expired. Please log in again.");
-          sessionService.clearSession();
-          window.location.href = "/";
-        }
+      } catch (err) {
+        setError("An error occurred while fetching courses.");
       }
     };
 
-    fetchUsers();
+    fetchCourses();
   }, [currentPage, setSearchParams]);
 
-  const handleEditUser = (updatedUser: User) => {
-    if (!users) return;
-    setUsers(
-      users.map((u) =>
-        u.user_name === updatedUser.user_name ? updatedUser : u
-      )
-    );
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setSearchParams({ page: String(currentPage - 1) });
+    }
   };
 
   const handleNextPage = () => {
@@ -67,18 +64,20 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setSearchParams({ page: String(currentPage - 1) });
-    }
+  const handleViewMembers = (courseId: string, courseName: string) => {
+    navigate(`/course/${courseId}/members?name=${encodeURIComponent(courseName)}`);
+  };
+
+  const handleViewLogs = (courseId: string, courseName: string) => {
+    navigate(`/course/${courseId}/logs?name=${encodeURIComponent(courseName)}`);
   };
 
   return (
     <div className="w-8/12 mx-auto">
-      <TabNavigation activeTab="user-management" />
+      <TabNavigation activeTab="course-management" />
 
       <div className="flex justify-end mt-10">
-        <TextField.Root placeholder="Search the users…" className="w-64">
+        <TextField.Root placeholder="Search the Courses…" className="w-64">
           <TextField.Slot>
             <MagnifyingGlassIcon height="16" width="16" />
           </TextField.Slot>
@@ -93,8 +92,10 @@ const UserManagement: React.FC = () => {
           </Flex>
         </Callout.Root>
       )}
+
       <div className="mt-10">
-        <UserTable users={users} onEdit={handleEditUser} />
+        {}
+        <CourseTable courses={courses ?? []} onViewMembers={handleViewMembers} onViewLogs={handleViewLogs}/>
       </div>
 
       <div className="flex justify-center gap-4 mt-8">
@@ -123,6 +124,4 @@ const UserManagement: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default UserManagement;
+}

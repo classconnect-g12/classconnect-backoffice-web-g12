@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import sessionService from "../services/sessionService";
 
 interface TabNavigationProps {
-  activeTab: "home" | "admin-register" | "user-management";
+  activeTab: "home" | "admin-register" | "user-management" | "course-management";
 }
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab }) => {
@@ -30,6 +30,12 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab }) => {
         active={activeTab === "user-management"}
       >
         User management
+      </TabNav.Link>
+      <TabNav.Link
+        href="#/course-management"
+        active={activeTab === "course-management"}
+      >
+        Course management
       </TabNav.Link>
       <TabNav.Link href="#/" onClick={handleLogout}>
         <span className="text-red-500">Logout</span>

@@ -1,8 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const login = async (email: string, password: string) => {
   try {
-    const response = await axios.post('https://classconnect-api-gateway-g12-production.up.railway.app/admin/auth/login', {
+    const response = await axios.post(`${API_URL}/admin/auth/login`, {
       email,
       password,
     });
@@ -11,13 +13,13 @@ const login = async (email: string, password: string) => {
     console.error("There was an error logging in!", error);
     throw error;
   }
-}
+};
 
 const register = async (email: string, password: string) => {
   try {
-    const response = await axios.post('https://classconnect-api-gateway-g12-production.up.railway.app/admin/auth/register',
-      {email,
-      password},
+    const response = await axios.post(
+      `${API_URL}/admin/auth/register`,
+      { email, password },
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -29,7 +31,7 @@ const register = async (email: string, password: string) => {
     console.error("There was an error registering!", error);
     throw error;
   }
-}
+};
 
 export default {
   login,

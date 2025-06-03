@@ -11,4 +11,8 @@ export const PERMISSION_LABELS: Record<string, string> = {
   EDIT_ASSESSMENT: "Edit Assessment",
   DELETE_ASSESMENT: "Delete Assessment",
   REVIEW_ASSESSMENT: "Review Assessment",
+  FORUM_EDIT_QUESTION: "Edit Forum Question",
+  FORUM_DELETE_QUESTION: "Delete Forum Question",
+  FORUM_EDIT_ANSWER: "Edit Forum Answer",
+  FORUM_DELETE_ANSWER: "Delete Forum Answer",
 };

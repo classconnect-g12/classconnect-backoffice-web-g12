@@ -40,6 +40,10 @@ const PERMISSION_LABELS: Record<string, string> = {
   EDIT_ASSESSMENT: "Edit assessment",
   DELETE_ASSESMENT: "Delete assessment",
   REVIEW_ASSESSMENT: "Review assessment",
+  FORUM_EDIT_QUESTION: "Edit Forum Question",
+  FORUM_DELETE_QUESTION: "Delete Forum Question",
+  FORUM_EDIT_ANSWER: "Edit Forum Answer",
+  FORUM_DELETE_ANSWER: "Delete Forum Answer",
 };
 
 const ALL_PERMISSIONS = Object.keys(PERMISSION_LABELS);
@@ -257,7 +261,7 @@ export default function MembersPage() {
             </Select.Root>
 
             <label className="block font-medium mt-4 mb-2">Permissions</label>
-            <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
               {ALL_PERMISSIONS.map((perm) => (
                 <label key={perm} className="flex items-center gap-2">
                   <Checkbox
